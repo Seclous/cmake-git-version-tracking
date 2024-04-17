@@ -28,23 +28,11 @@ bool git_IsPopulated();
 /// in the CommitID?
 bool git_AnyUncommittedChanges();
 
-/// The commit author's name.
-const char* git_AuthorName();
-
-/// The commit author's email.
-const char* git_AuthorEmail();
-
 /// The commit SHA1.
 const char* git_CommitSHA1();
 
 /// The ISO8601 commit date.
 const char* git_CommitDate();
-
-/// The commit subject.
-const char* git_CommitSubject();
-
-/// The commit body.
-const char* git_CommitBody();
 
 /// The commit describe.
 const char* git_Describe();
@@ -111,28 +99,12 @@ inline bool IsPopulated() {
 inline bool AnyUncommittedChanges() {
   return  git_AnyUncommittedChanges();
 }
-inline const StringOrView& AuthorName() {
-  static const StringOrView kValue = internal::InitString(git_AuthorName());
-  return kValue;
-}
-inline const StringOrView AuthorEmail() {
-  static const StringOrView kValue = internal::InitString(git_AuthorEmail());
-  return kValue;
-}
 inline const StringOrView CommitSHA1() {
   static const StringOrView kValue = internal::InitString(git_CommitSHA1());
   return kValue;
 }
 inline const StringOrView CommitDate() {
   static const StringOrView kValue = internal::InitString(git_CommitDate());
-  return kValue;
-}
-inline const StringOrView CommitSubject() {
-  static const StringOrView kValue = internal::InitString(git_CommitSubject());
-  return kValue;
-}
-inline const StringOrView CommitBody() {
-  static const StringOrView kValue = internal::InitString(git_CommitBody());
   return kValue;
 }
 inline const StringOrView Describe() {

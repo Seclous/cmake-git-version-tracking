@@ -98,11 +98,7 @@ set(_state_variable_names
     GIT_RETRIEVED_STATE
     GIT_HEAD_SHA1
     GIT_IS_DIRTY
-    GIT_AUTHOR_NAME
-    GIT_AUTHOR_EMAIL
     GIT_COMMIT_DATE_ISO8601
-    GIT_COMMIT_SUBJECT
-    GIT_COMMIT_BODY
     GIT_DESCRIBE
     GIT_BRANCH
     # >>>
@@ -177,50 +173,9 @@ function(GetGitState _working_dir)
         set(ENV{GIT_HEAD_SHA1} ${output})
     endif()
 
-    RunGitCommand(show -s "--format=%an" ${object})
-    if(exit_code EQUAL 0)
-        set(ENV{GIT_AUTHOR_NAME} "${output}")
-    endif()
-
-    RunGitCommand(show -s "--format=%ae" ${object})
-    if(exit_code EQUAL 0)
-        set(ENV{GIT_AUTHOR_EMAIL} "${output}")
-    endif()
-
     RunGitCommand(show -s "--format=%ci" ${object})
     if(exit_code EQUAL 0)
         set(ENV{GIT_COMMIT_DATE_ISO8601} "${output}")
-    endif()
-
-    RunGitCommand(show -s "--format=%s" ${object})
-    if(exit_code EQUAL 0)
-        # Escape \
-        string(REPLACE "\\" "\\\\" output "${output}")
-        # Escape quotes
-        string(REPLACE "\"" "\\\"" output "${output}")
-        set(ENV{GIT_COMMIT_SUBJECT} "${output}")
-    endif()
-
-    RunGitCommand(show -s "--format=%b" ${object})
-    if(exit_code EQUAL 0)
-        if(output)
-            # Escape \
-            string(REPLACE "\\" "\\\\" output "${output}")
-            # Escape quotes
-            string(REPLACE "\"" "\\\"" output "${output}")
-            # Escape line breaks in the commit message.
-            string(REPLACE "\r\n" "\\r\\n\\\r\n" safe "${output}")
-            if(safe STREQUAL output)
-                # Didn't have windows lines - try unix lines.
-                string(REPLACE "\n" "\\n\\\n" safe "${output}")
-            endif()
-        else()
-            # There was no commit body - set the safe string to empty.
-            set(safe "")
-        endif()
-        set(ENV{GIT_COMMIT_BODY} "${safe}")
-    else()
-        set(ENV{GIT_COMMIT_BODY} "") # empty string.
     endif()
 
     # Get output of git describe
