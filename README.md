@@ -11,18 +11,21 @@ The core capability is baked into single self-contained
 - Git
 
 ## Quickstart via FetchContent
-You can use CMake's `FetchContent` module to build the static library `cmake_git_version_tracking`:
+You can use CMake's `FetchContent` module to build the object library `cmake_git_version_tracking`:
 ```cmake
 include(FetchContent)
-FetchContent_Declare(cmake_git_version_tracking                   
-  GIT_REPOSITORY https://github.com/andrew-hardin/cmake-git-version-tracking.git
-  GIT_TAG 904dbda1336ba4b9a1415a68d5f203f576b696bb
-)
+FetchContent_Declare(
+        cmake_git_version_tracking
+        GIT_REPOSITORY https://github.com/Seclous/cmake-git-version-tracking.git
+        GIT_TAG 35cfafd13e69c721c88eed29216f204cdb11ccbe)
 FetchContent_MakeAvailable(cmake_git_version_tracking)
 
-target_link_libraries(your_target
-  cmake_git_version_tracking
-)
+target_sources(your_target PRIVATE
+        $<TARGET_OBJECTS:cmake_git_version_tracking>)
+
+target_include_directories(your_target
+        PRIVATE
+        $<TARGET_PROPERTY:cmake_git_version_tracking,INTERFACE_INCLUDE_DIRECTORIES>)
 ```
 Then [`#include git.h`](./git.h) and use the provided functions to retrieve git metadata.
 
