@@ -13,7 +13,7 @@ include(git_watcher.cmake)
 # Note that the include is a system include. This was done
 # so downstream projects don't suffer from warnings on a
 # 3rdparty library.
-add_library(${PROJECT_NAME} STATIC ${POST_CONFIGURE_FILE})
+add_library(${PROJECT_NAME} OBJECT ${POST_CONFIGURE_FILE})
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 add_dependencies(${PROJECT_NAME} check_git)
 
