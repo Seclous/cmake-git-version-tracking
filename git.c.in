@@ -18,3 +18,6 @@ const char* git_Describe() {
 const char* git_Branch() {
     return "@GIT_BRANCH@";
 }
+const char* git_Tag() {
+    return "@GIT_TAG@";
+}
