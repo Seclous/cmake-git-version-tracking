@@ -1,14 +1,52 @@
+macro(PATH_TO_ABSOLUTE var_name)
+    get_filename_component(${var_name} "${${var_name}}" ABSOLUTE)
+endmacro()
+
+# Check that a required variable is set.
+macro(CHECK_REQUIRED_VARIABLE var_name)
+    if(NOT DEFINED ${var_name})
+        message(FATAL_ERROR "The \"${var_name}\" variable must be defined.")
+    endif()
+    PATH_TO_ABSOLUTE(${var_name})
+endmacro()
+
+# Check that an optional variable is set, or, set it to a default value.
+macro(CHECK_OPTIONAL_VARIABLE_NOPATH var_name default_value)
+    if(NOT DEFINED ${var_name})
+        set(${var_name} ${default_value})
+    endif()
+endmacro()
+
+# Check that an optional variable is set, or, set it to a default value.
+# Also converts that path to an abspath.
+macro(CHECK_OPTIONAL_VARIABLE var_name default_value)
+    CHECK_OPTIONAL_VARIABLE_NOPATH(${var_name} ${default_value})
+    PATH_TO_ABSOLUTE(${var_name})
+endmacro()
+
+CHECK_OPTIONAL_VARIABLE(GIT_STATE_FILE "${CMAKE_CURRENT_BINARY_DIR}/git-state-hash")
+CHECK_OPTIONAL_VARIABLE(GIT_WORKING_DIR "${CMAKE_SOURCE_DIR}")
+CHECK_OPTIONAL_VARIABLE_NOPATH(GIT_FAIL_IF_NONZERO_EXIT TRUE)
+CHECK_OPTIONAL_VARIABLE_NOPATH(GIT_IGNORE_UNTRACKED FALSE)
+
+# Check the optional git variable.
+# If it's not set, we'll try to find it using the CMake packaging system.
+if(NOT DEFINED GIT_EXECUTABLE)
+    find_package(Git QUIET REQUIRED)
+endif()
+CHECK_REQUIRED_VARIABLE(GIT_EXECUTABLE)
+
 set(_state_variable_names
-    GIT_RETRIEVED_STATE
-    GIT_HEAD_SHA1
-    GIT_IS_DIRTY
-    GIT_COMMIT_DATE_ISO8601
-    GIT_DESCRIBE
-    GIT_BRANCH
-    GIT_TAG
-    # >>>
-    # 1. Add the name of the additional git variable you're interested in monitoring
-    #    to this list.
+        GIT_RETRIEVED_STATE
+        GIT_HEAD_SHA1
+        GIT_IS_DIRTY
+        GIT_COMMIT_DATE_ISO8601
+        GIT_DESCRIBE
+        GIT_BRANCH
+        GIT_TAG
+        # >>>
+        # 1. Add the name of the additional git variable you're interested in monitoring
+        #    to this list.
 )
 
 
@@ -20,12 +58,12 @@ set(_state_variable_names
 #              with caution.
 macro(RunGitCommand)
     execute_process(COMMAND
-        "${GIT_EXECUTABLE}" ${ARGV}
-        WORKING_DIRECTORY "${_working_dir}"
-        RESULT_VARIABLE exit_code
-        OUTPUT_VARIABLE output
-        ERROR_VARIABLE stderr
-        OUTPUT_STRIP_TRAILING_WHITESPACE)
+            "${GIT_EXECUTABLE}" ${ARGV}
+            WORKING_DIRECTORY "${_working_dir}"
+            RESULT_VARIABLE exit_code
+            OUTPUT_VARIABLE output
+            ERROR_VARIABLE stderr
+            OUTPUT_STRIP_TRAILING_WHITESPACE)
     if(NOT exit_code EQUAL 0 AND NOT _permit_git_failure)
         set(ENV{GIT_RETRIEVED_STATE} "false")
 
@@ -90,7 +128,7 @@ function(GetGitState _working_dir)
     else()
         set(ENV{GIT_DESCRIBE} "${output}")
     endif()
-    
+
     # Convert HEAD to a symbolic ref. This can fail, in which case we just
     # set that variable to HEAD.
     set(_permit_git_failure ON)
@@ -195,13 +233,13 @@ endfunction()
 #              changed, then a file is configured.
 function(SetupGitMonitoring)
     add_custom_target(check_git
-        ALL
-        DEPENDS ${PRE_CONFIGURE_FILE}
-        BYPRODUCTS
+            ALL
+            DEPENDS ${PRE_CONFIGURE_FILE}
+            BYPRODUCTS
             ${POST_CONFIGURE_FILE}
             ${GIT_STATE_FILE}
-        COMMENT "Checking the git repository for changes..."
-        COMMAND
+            COMMENT "Checking the git repository for changes..."
+            COMMAND
             ${CMAKE_COMMAND}
             -D_BUILD_TIME_CHECK_GIT=TRUE
             -DGIT_WORKING_DIR=${GIT_WORKING_DIR}
@@ -220,6 +258,8 @@ endfunction()
 # Description: primary entry-point to the script. Functions are selected based
 #              on whether it's configure or build time.
 function(Main)
+    CHECK_REQUIRED_VARIABLE(PRE_CONFIGURE_FILE)
+    CHECK_REQUIRED_VARIABLE(POST_CONFIGURE_FILE)
     if(_BUILD_TIME_CHECK_GIT)
         # Check if the repo has changed.
         # If so, run the change action.

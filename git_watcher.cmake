@@ -52,45 +52,6 @@
 #   commit was made. There are two sections you need to modify,
 #   and they're tagged with a ">>>" header.
 # Short hand for converting paths to absolute.
-macro(PATH_TO_ABSOLUTE var_name)
-    get_filename_component(${var_name} "${${var_name}}" ABSOLUTE)
-endmacro()
-
-# Check that a required variable is set.
-macro(CHECK_REQUIRED_VARIABLE var_name)
-    if(NOT DEFINED ${var_name})
-        message(FATAL_ERROR "The \"${var_name}\" variable must be defined.")
-    endif()
-    PATH_TO_ABSOLUTE(${var_name})
-endmacro()
-
-# Check that an optional variable is set, or, set it to a default value.
-macro(CHECK_OPTIONAL_VARIABLE_NOPATH var_name default_value)
-    if(NOT DEFINED ${var_name})
-        set(${var_name} ${default_value})
-    endif()
-endmacro()
-
-# Check that an optional variable is set, or, set it to a default value.
-# Also converts that path to an abspath.
-macro(CHECK_OPTIONAL_VARIABLE var_name default_value)
-    CHECK_OPTIONAL_VARIABLE_NOPATH(${var_name} ${default_value})
-    PATH_TO_ABSOLUTE(${var_name})
-endmacro()
-
-CHECK_REQUIRED_VARIABLE(PRE_CONFIGURE_FILE)
-CHECK_REQUIRED_VARIABLE(POST_CONFIGURE_FILE)
-CHECK_OPTIONAL_VARIABLE(GIT_STATE_FILE "${CMAKE_CURRENT_BINARY_DIR}/git-state-hash")
-CHECK_OPTIONAL_VARIABLE(GIT_WORKING_DIR "${CMAKE_SOURCE_DIR}")
-CHECK_OPTIONAL_VARIABLE_NOPATH(GIT_FAIL_IF_NONZERO_EXIT TRUE)
-CHECK_OPTIONAL_VARIABLE_NOPATH(GIT_IGNORE_UNTRACKED FALSE)
-
-# Check the optional git variable.
-# If it's not set, we'll try to find it using the CMake packaging system.
-if(NOT DEFINED GIT_EXECUTABLE)
-    find_package(Git QUIET REQUIRED)
-endif()
-CHECK_REQUIRED_VARIABLE(GIT_EXECUTABLE)
 
 include(${CMAKE_CURRENT_LIST_DIR}/git_watcher_functions.cmake)
 
