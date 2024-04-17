@@ -92,8 +92,7 @@ if(NOT DEFINED GIT_EXECUTABLE)
 endif()
 CHECK_REQUIRED_VARIABLE(GIT_EXECUTABLE)
 
-
-include(git_watcher_functions.cmake)
+include(${CMAKE_CURRENT_LIST_DIR}/git_watcher_functions.cmake)
 
 # And off we go...
 Main()

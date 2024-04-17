@@ -211,7 +211,7 @@ function(SetupGitMonitoring)
             -DPOST_CONFIGURE_FILE=${POST_CONFIGURE_FILE}
             -DGIT_FAIL_IF_NONZERO_EXIT=${GIT_FAIL_IF_NONZERO_EXIT}
             -DGIT_IGNORE_UNTRACKED=${GIT_IGNORE_UNTRACKED}
-            -P "${CMAKE_CURRENT_LIST_FILE}")
+            -P "${CMAKE_CURRENT_LIST_DIR}/git_watcher.cmake")
 endfunction()
 
 
